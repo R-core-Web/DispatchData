@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daman Group - Dispatch Mapping Server</title>
+  <!-- Flatpickr for strict DD-MM-YYYY Calendar -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      background-color: #0f172a;
+      min-height: 100vh;
+    }
+
+    /* ---------------- LOGIN SCREEN ---------------- */
+    #loginScreen {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #1e293b, #0f172a);
+      padding: 20px;
+    }
+    .login-box {
+      background: #ffffff;
+      padding: 35px 30px;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      text-align: center;
+    }
+    .logo-container {
+      background-color: #0d1224;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .logo-img {
+      max-width: 100%;
+      height: 48px;
+      object-fit: contain;
+    }
+    .login-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 20px;
+    }
+    .input-field {
+      width: 100%;
+      padding: 12px 14px;
+      margin-bottom: 15px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 14px;
+      outline: none;
+    }
+    .input-field:focus {
+      border-color: #e67e22;
+      box-shadow: 0 0 0 2px rgba(230, 126, 34, 0.2);
+    }
+    .login-btn {
+      width: 100%;
+      padding: 12px;
+      background: #e67e22;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .login-btn:hover { background: #d35400; }
+    .error-msg {
+      color: #ef4444;
+      font-size: 13px;
+      margin-top: 10px;
+      display: none;
+    }
+
+    /* ---------------- DASHBOARD SCREEN ---------------- */
+    #dashboardScreen {
+      display: none;
+      background-color: #f1f5f9;
+      min-height: 100vh;
+    }
+    .navbar {
+      background-color: #0b132b;
+      padding: 10px 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 3px solid #e67e22;
+    }
+    .nav-brand .logo-img { height: 42px; }
+    .logout-btn {
+      background: #ef4444;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .logout-btn:hover { background: #dc2626; }
+
+    .dashboard-container {
+      max-width: 1400px;
+      margin: 20px auto;
+      padding: 0 20px;
+    }
+
+    /* Top Page Header Banner */
+    .dashboard-header {
+      background: #ffffff;
+      padding: 18px 25px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border-left: 5px solid #0b132b;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .dashboard-header h1 {
+      font-size: 22px;
+      font-weight: 800;
+      color: #0b132b;
+      letter-spacing: 0.5px;
+    }
+    .dashboard-header p {
+      font-size: 12px;
+      color: #64748b;
+      font-weight: 600;
+      margin-top: 3px;
+    }
+    .live-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #16a34a;
+      background: #dcfce7;
+      padding: 6px 12px;
+      border-radius: 20px;
+    }
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      background: #16a34a;
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.2); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    /* Trip Status Tabs */
+    .status-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .tab-btn {
+      padding: 10px 24px;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #475569;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .tab-btn:hover {
+      background: #f8fafc;
+      border-color: #94a3b8;
+    }
+    .tab-btn.active {
+      background: #0b132b;
+      color: #ffffff;
+      border-color: #0b132b;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    }
+
+    /* Summary Stats Cards */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: #ffffff;
+      border-left: 4px solid #e67e22;
+      border-radius: 8px;
+      padding: 15px 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .stat-title {
+      font-size: 12px;
+      color: #64748b;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    .stat-val {
+      font-size: 24px;
+      font-weight: 800;
+      color: #0f172a;
+      margin-top: 5px;
+    }
+
+    /* Filter Card */
+    .filter-card {
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
+    }
+    .grid-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      align-items: end;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+    label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 6px;
+    }
+    input, select {
+      padding: 9px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 13px;
+      background: #fff;
+    }
+    input:focus, select:focus {
+      outline: 2px solid #e67e22;
+      border-color: transparent;
+    }
+
+    /* Advance Filters */
+    .advance-toggle-btn {
+      background: none;
+      border: none;
+      color: #d35400;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 14px;
+      padding: 10px 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    #advanceFilterSection {
+      display: none;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px dashed #cbd5e1;
+    }
+
+    /* Action Buttons */
+    .btn-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+      align-items: center;
+    }
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-search { background-color: #0b132b; color: white; }
+    .btn-search:hover { background-color: #1e293b; }
+    .btn-reset { background-color: #94a3b8; color: white; }
+    .btn-reset:hover { background-color: #64748b; }
+    .btn-download { background-color: #16a34a; color: white; margin-left: auto; }
+    .btn-download:hover { background-color: #15803d; }
+
+    /* Records Table */
+    .table-box {
+      background: #ffffff;
+      border-radius: 8px;
+      overflow-x: auto;
+      max-height: 550px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    th {
+      background-color: #0b132b;
+      color: white;
+      position: sticky;
+      top: 0;
+      padding: 12px 10px;
+      text-align: left;
+      white-space: nowrap;
+      z-index: 10;
+    }
+    td {
+      padding: 11px 10px;
+      border-bottom: 1px solid #f1f5f9;
+      color: #334155;
+      white-space: nowrap;
+    }
+    tr:hover { background-color: #f8fafc; }
+    .status-msg {
+      text-align: center;
+      padding: 30px;
+      color: #64748b;
+      font-size: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. LOGIN SCREEN -->
+  <div id="loginScreen">
+    <div class="login-box">
+      <div class="logo-container">
+        <img id="loginLogo" class="logo-img" alt="Daman Group Logo">
+      </div>
+      <div class="login-title">Dispatch Mapping Server - Login</div>
+
+      <input type="text" id="username" class="input-field" placeholder="Username (admin)" required>
+      <input type="password" id="password" class="input-field" placeholder="Password (daman123)" required>
+      
+      <button class="login-btn" onclick="handleLogin()">Login to Dashboard</button>
+      <div id="loginError" class="error-msg">Galat Username ya Password!</div>
+    </div>
+  </div>
+
+  <!-- 2. DASHBOARD SCREEN -->
+  <div id="dashboardScreen">
+    <nav class="navbar">
+      <div class="nav-brand">
+        <img id="navLogo" class="logo-img" alt="Daman Group">
+      </div>
+      <button class="logout-btn" onclick="handleLogout()">Logout</button>
+    </nav>
+
+    <div class="dashboard-container">
+      
+      <!-- Top Title Bar -->
+      <div class="dashboard-header">
+        <div>
+          <h1>Dispatch mapping server</h1>
+          <p>Real-time fleet operations, dispatch tracking & freight calculation</p>
+        </div>
+        <div class="live-status">
+          <div class="live-dot"></div>
+          Connected
+        </div>
+      </div>
+
+      <!-- Open / Close Trip Tabs -->
+      <div class="status-tabs">
+        <button class="tab-btn active" id="tabAll" onclick="setTripStatus('ALL')">All Trips</button>
+        <button class="tab-btn" id="tabOpen" onclick="setTripStatus('OPEN')">Open Trips</button>
+        <button class="tab-btn" id="tabClose" onclick="setTripStatus('CLOSE')">Close Trips</button>
+      </div>
+
+      <!-- KPI Stats -->
+      <div class="summary-grid">
+        <div class="stat-card">
+          <div class="stat-title">Total Trips Found</div>
+          <div class="stat-val" id="totalTrips">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Total Freight Amount (₹)</div>
+          <div class="stat-val" id="totalAmount">₹0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Avg Rate / Trip</div>
+          <div class="stat-val" id="avgRate">₹0</div>
+        </div>
+      </div>
+
+      <!-- Filters Panel -->
+      <div class="filter-card">
+        <div class="grid-row">
+          <div class="form-group">
+            <label for="vehicleInput">Vehicle No. (Small ya Capital)</label>
+            <input type="text" id="vehicleInput" placeholder="e.g. cg07ca5811 ya CG07CA5811">
+          </div>
+          <div class="form-group">
+            <label for="startDate">Start Date (DD-MM-YYYY)</label>
+            <input type="text" id="startDate" placeholder="DD-MM-YYYY" autocomplete="off">
+          </div>
+          <div class="form-group">
+            <label for="endDate">End Date (DD-MM-YYYY)</label>
+            <input type="text" id="endDate" placeholder="DD-MM-YYYY" autocomplete="off">
+          </div>
+        </div>
+
+        <!-- Advance Filter Trigger Button -->
+        <button type="button" class="advance-toggle-btn" onclick="toggleAdvanceFilters()">
+          <span id="toggleIcon">➕</span> Advance Filters (Loading, Unloading, Rates)
+        </button>
+
+        <!-- Advance Filter Details -->
+        <div id="advanceFilterSection">
+          <div class="grid-row">
+            <div class="form-group">
+              <label for="loadingSelect">Loading Point (From Location)</label>
+              <select id="loadingSelect">
+                <option value="">All Loading Points</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="unloadingSelect">Unloading Point (To Location)</label>
+              <select id="unloadingSelect">
+                <option value="">All Unloading Points</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="minRate">Min Rate (₹)</label>
+              <input type="number" id="minRate" placeholder="e.g. 1000">
+            </div>
+
+            <div class="form-group">
+              <label for="maxRate">Max Rate (₹)</label>
+              <input type="number" id="maxRate" placeholder="e.g. 50000">
+            </div>
+          </div>
+        </div>
+
+        <div class="btn-container">
+          <button class="btn btn-search" onclick="filterRecords()">🔍 Search Records</button>
+          <button class="btn btn-reset" onclick="resetAll()">🔄 Reset</button>
+          <button class="btn btn-download" onclick="downloadData()">📥 Download (Excel/CSV)</button>
+        </div>
+      </div>
+
+      <!-- Records Table -->
+      <div class="table-box">
+        <table>
+          <thead>
+            <tr id="tableHeader"></tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr><td colspan="100%" class="status-msg">Google Sheet se live data fetch ho raha hai...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ---------------- EMBEDDED LOGO (Vector SVG) ----------------
+    const DAMAN_LOGO_SVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 70"><rect width="70" height="70" rx="10" fill="%23131c38"/><path d="M 20 15 L 42 15 C 56 15 62 25 62 35 C 62 46 56 56 42 56 L 20 56 Z" fill="%23e87717"/><path d="M 28 22 L 40 22 C 48 22 53 27 53 35 C 53 43 48 48 40 48 L 28 48 Z" fill="%23131c38"/><path d="M 28 25 L 40 25 C 46 25 50 29 50 35 C 50 41 46 45 40 45 L 28 45" stroke="white" stroke-width="2" stroke-dasharray="3,3" fill="none"/><path d="M 12 25 L 28 25 L 24 31 L 14 31 Z" fill="white"/><path d="M 15 33 L 26 33 L 22 39 L 17 39 Z" fill="white"/><text x="85" y="36" fill="white" font-family="'Segoe UI', Arial, sans-serif" font-weight="900" font-size="28">Daman Group</text><text x="85" y="55" fill="%23e87717" font-family="'Segoe UI', Arial, sans-serif" font-weight="700" font-size="13">DAMAN MANDEEP ROADLINE PVT. LTD.</text></svg>`;
+
+    document.getElementById('loginLogo').src = DAMAN_LOGO_SVG;
+    document.getElementById('navLogo').src = DAMAN_LOGO_SVG;
+
+    // ---------------- AUTH CREDENTIALS ----------------
+    const AUTH_USER = "admin";
+    const AUTH_PASS = "daman123";
+
+    // ---------------- GOOGLE SHEET DETAILS ----------------
+    const SHEET_ID = '1ZkWgsEak4VxJK4gpJ2u2J_CI3LPYVOYhYAPrV2RvyyM';
+    const SHEET_NAME = encodeURIComponent('Dispatch Raw Data'); 
+
+    let rawData = [];
+    let currentFilteredData = [];
+    let activeTripStatus = 'ALL'; // 'ALL', 'OPEN', 'CLOSE'
+    let startPicker, endPicker;
+
+    // Flatpickr in DD-MM-YYYY
+    window.addEventListener('DOMContentLoaded', () => {
+      startPicker = flatpickr("#startDate", { dateFormat: "d-m-Y", allowInput: true });
+      endPicker = flatpickr("#endDate", { dateFormat: "d-m-Y", allowInput: true });
+    });
+
+    window.onload = function() {
+      if (sessionStorage.getItem('isLoggedIn') === 'true') {
+        showDashboard();
+      }
+    };
+
+    function handleLogin() {
+      const user = document.getElementById('username').value.trim();
+      const pass = document.getElementById('password').value.trim();
+      const err = document.getElementById('loginError');
+
+      if (user === AUTH_USER && pass === AUTH_PASS) {
+        err.style.display = 'none';
+        sessionStorage.setItem('isLoggedIn', 'true');
+        showDashboard();
+      } else {
+        err.style.display = 'block';
+      }
+    }
+
+    function handleLogout() {
+      sessionStorage.removeItem('isLoggedIn');
+      document.getElementById('dashboardScreen').style.display = 'none';
+      document.getElementById('loginScreen').style.display = 'flex';
+      document.getElementById('username').value = '';
+      document.getElementById('password').value = '';
+    }
+
+    function showDashboard() {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('dashboardScreen').style.display = 'block';
+      if (rawData.length === 0) {
+        fetchData();
+      }
+    }
+
+    function toggleAdvanceFilters() {
+      const section = document.getElementById('advanceFilterSection');
+      const icon = document.getElementById('toggleIcon');
+      if (section.style.display === 'block') {
+        section.style.display = 'none';
+        icon.textContent = '➕';
+      } else {
+        section.style.display = 'block';
+        icon.textContent = '➖';
+      }
+    }
+
+    // Switch Open/Close Trip Tab
+    function setTripStatus(status) {
+      activeTripStatus = status;
+      document.getElementById('tabAll').classList.toggle('active', status === 'ALL');
+      document.getElementById('tabOpen').classList.toggle('active', status === 'OPEN');
+      document.getElementById('tabClose').classList.toggle('active', status === 'CLOSE');
+      filterRecords();
+    }
+
+    // Google Visualization API JSONP - Bypass browser CORS completely
+    function fetchData() {
+      const script = document.createElement('script');
+      script.src = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${SHEET_NAME}&tqx=responseHandler:handleGvizResponse`;
+      script.onerror = function() {
+        document.getElementById('tableBody').innerHTML = 
+          '<tr><td colspan="100%" class="status-msg" style="color:#ef4444;">Network connection error. Kripya check karein internet on hai ya nahi.</td></tr>';
+      };
+      document.body.appendChild(script);
+    }
+
+    window.handleGvizResponse = function(res) {
+      if (!res || !res.table || !res.table.rows) {
+        document.getElementById('tableBody').innerHTML = 
+          '<tr><td colspan="100%" class="status-msg" style="color:red;">Sheet data format load nahi ho saka.</td></tr>';
+        return;
+      }
+
+      const headers = [];
+      res.table.cols.forEach(col => {
+        headers.push(col.label ? col.label.trim().replace(/[\r\n]+/g, ' ') : '');
+      });
+
+      const parsed = [];
+
+      res.table.rows.forEach(r => {
+        if (!r.c || r.c.length === 0) return;
+        const obj = {};
+        let hasData = false;
+
+        headers.forEach((h, idx) => {
+          const cell = r.c[idx];
+          let val = '';
+          if (cell) {
+            val = cell.f ? cell.f : (cell.v !== null && cell.v !== undefined ? cell.v : '');
+          }
+
+          if (typeof val === 'string' && val.startsWith('Date(')) {
+            const m = val.match(/Date\((\d+),(\d+),(\d+)/);
+            if (m) {
+              const y = m[1];
+              const mo = String(parseInt(m[2], 10) + 1).padStart(2, '0');
+              const d = String(m[3]).padStart(2, '0');
+              val = `${d}-${mo}-${y}`;
+            }
+          }
+          val = String(val).trim();
+          if (val) hasData = true;
+          obj[h || `Col_${idx}`] = val;
+        });
+
+        if (hasData) parsed.push(obj);
+      });
+
+      rawData = parsed;
+      currentFilteredData = [...rawData];
+      populateDropdowns(rawData);
+      renderUI(rawData);
+    };
+
+    function getVal(row, possibleNames) {
+      for (const name of possibleNames) {
+        for (const key of Object.keys(row)) {
+          const cleanKey = key.toLowerCase().replace(/[\r\n]/g, ' ').replace(/[^a-z0-9]/g, '');
+          const cleanTarget = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+          if (cleanKey === cleanTarget) {
+            return row[key] ? String(row[key]).trim() : '';
+          }
+        }
+      }
+      return '';
+    }
+
+    function cleanStr(str) {
+      return (str || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    }
+
+    function toDateNum(val) {
+      if (!val) return null;
+      val = String(val).trim();
+
+      const datePart = val.split(' ')[0].trim();
+
+      const dmy = datePart.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})/);
+      if (dmy) {
+        const d = String(dmy[1]).padStart(2, '0');
+        const m = String(dmy[2]).padStart(2, '0');
+        const y = dmy[3];
+        return parseInt(`${y}${m}${d}`, 10);
+      }
+
+      const ymd = datePart.match(/^(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})/);
+      if (ymd) {
+        const y = ymd[1];
+        const m = String(ymd[2]).padStart(2, '0');
+        const d = String(ymd[3]).padStart(2, '0');
+        return parseInt(`${y}${m}${d}`, 10);
+      }
+
+      return null;
+    }
+
+    function populateDropdowns(data) {
+      const loadSet = new Set();
+      const unloadSet = new Set();
+
+      data.forEach(row => {
+        const load = getVal(row, ['from location', 'from', 'loading point']);
+        const unload = getVal(row, ['to location', 'to', 'unloading point']);
+        if (load && load !== '0' && load !== '-') loadSet.add(load);
+        if (unload && unload !== '0' && unload !== '-') unloadSet.add(unload);
+      });
+
+      fillDropdown('loadingSelect', loadSet);
+      fillDropdown('unloadingSelect', unloadSet);
+    }
+
+    function fillDropdown(id, items) {
+      const select = document.getElementById(id);
+      select.innerHTML = '<option value="">All Points</option>';
+      Array.from(items).sort().forEach(item => {
+        const opt = document.createElement('option');
+        opt.value = item;
+        opt.textContent = item;
+        select.appendChild(opt);
+      });
+    }
+
+    function renderUI(data) {
+      currentFilteredData = data;
+      const header = document.getElementById('tableHeader');
+      const body = document.getElementById('tableBody');
+
+      header.innerHTML = '';
+      body.innerHTML = '';
+
+      let totalAmount = 0;
+
+      if (data.length === 0) {
+        body.innerHTML = '<tr><td colspan="100%" class="status-msg">Koi matching trip nahi mila. Filters check karein!</td></tr>';
+        updateStats(0, 0);
+        return;
+      }
+
+      const cols = Object.keys(data[0]);
+      cols.forEach(col => {
+        const th = document.createElement('th');
+        th.textContent = col;
+        header.appendChild(th);
+      });
+
+      data.forEach(row => {
+        const tr = document.createElement('tr');
+        cols.forEach(col => {
+          const td = document.createElement('td');
+          td.textContent = row[col] || '-';
+          tr.appendChild(td);
+        });
+        body.appendChild(tr);
+
+        const rawRate = getVal(row, ['freight amount auto', 'freight amount', 'rate with ld', 'rate with un', 'rate per tonne', 'rate']).replace(/[^0-9.-]+/g,"");
+        const rate = parseFloat(rawRate);
+        if (!isNaN(rate)) totalAmount += rate;
+      });
+
+      updateStats(data.length, totalAmount);
+    }
+
+    function updateStats(count, total) {
+      document.getElementById('totalTrips').textContent = count;
+      document.getElementById('totalAmount').textContent = '₹ ' + Math.round(total).toLocaleString('en-IN');
+      const avg = count > 0 ? (total / count) : 0;
+      document.getElementById('avgRate').textContent = '₹ ' + Math.round(avg).toLocaleString('en-IN');
+    }
+
+    // Filter Logic with Open/Close status
+    function filterRecords() {
+      const vehicleInput = cleanStr(document.getElementById('vehicleInput').value);
+      const startDateStr = document.getElementById('startDate').value.trim();
+      const endDateStr = document.getElementById('endDate').value.trim();
+      
+      const startNum = toDateNum(startDateStr);
+      const endNum = toDateNum(endDateStr);
+
+      const loading = document.getElementById('loadingSelect').value.trim().toLowerCase();
+      const unloading = document.getElementById('unloadingSelect').value.trim().toLowerCase();
+      const minRate = parseFloat(document.getElementById('minRate').value);
+      const maxRate = parseFloat(document.getElementById('maxRate').value);
+
+      const filtered = rawData.filter(row => {
+        const rowVeh = cleanStr(getVal(row, ['vehicle no', 'vehicle number', 'vehicle']));
+        const rawDate = getVal(row, ['trip start date', 'date', 'trip start']);
+        const rowDateNum = toDateNum(rawDate);
+        
+        const rowLoad = getVal(row, ['from location', 'from', 'loading point']).toLowerCase();
+        const rowUnload = getVal(row, ['to location', 'to', 'unloading point']).toLowerCase();
+
+        const rawRate = getVal(row, ['freight amount auto', 'freight amount', 'rate with ld', 'rate per tonne', 'rate']).replace(/[^0-9.-]+/g,"");
+        const rate = parseFloat(rawRate) || 0;
+
+        // Trip End Date check for Open / Close Tab
+        const endDateVal = getVal(row, ['trip end date', 'end date']).trim();
+        const isOpen = (endDateVal === '' || endDateVal === '-' || endDateVal === '0');
+
+        if (activeTripStatus === 'OPEN' && !isOpen) return false;
+        if (activeTripStatus === 'CLOSE' && isOpen) return false;
+
+        // Vehicle Match
+        if (vehicleInput && !rowVeh.includes(vehicleInput)) return false;
+
+        // Date Range Match
+        if (startNum !== null && (rowDateNum === null || rowDateNum < startNum)) return false;
+        if (endNum !== null && (rowDateNum === null || rowDateNum > endNum)) return false;
+
+        // Advance Filters
+        if (loading && rowLoad !== loading) return false;
+        if (unloading && rowUnload !== unloading) return false;
+        if (!isNaN(minRate) && rate < minRate) return false;
+        if (!isNaN(maxRate) && rate > maxRate) return false;
+
+        return true;
+      });
+
+      renderUI(filtered);
+    }
+
+    function resetAll() {
+      document.getElementById('vehicleInput').value = '';
+      document.getElementById('startDate').value = '';
+      document.getElementById('endDate').value = '';
+      if (startPicker) startPicker.clear();
+      if (endPicker) endPicker.clear();
+
+      document.getElementById('loadingSelect').value = '';
+      document.getElementById('unloadingSelect').value = '';
+      document.getElementById('minRate').value = '';
+      document.getElementById('maxRate').value = '';
+      setTripStatus('ALL');
+    }
+
+    // Download CSV
+    function downloadData() {
+      if (!currentFilteredData || currentFilteredData.length === 0) {
+        alert("Download karne ke liye data nahi hai!");
+        return;
+      }
+
+      const headers = Object.keys(currentFilteredData[0]);
+      let csvContent = "\uFEFF"; // UTF-8 BOM
+
+      csvContent += headers.map(h => `"${h.replace(/"/g, '""')}"`).join(",") + "\r\n";
+
+      currentFilteredData.forEach(row => {
+        const rowData = headers.map(h => {
+          const val = row[h] ? String(row[h]).replace(/"/g, '""') : '';
+          return `"${val}"`;
+        });
+        csvContent += rowData.join(",") + "\r\n";
+      });
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      const timeStamp = new Date().toISOString().slice(0, 10);
+      
+      link.setAttribute("href", url);
+      link.setAttribute("download", `Daman_Group_Dispatch_${activeTripStatus}_${timeStamp}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  </script>
+
+</body>
+</html>
